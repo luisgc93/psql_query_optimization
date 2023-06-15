@@ -13,7 +13,7 @@ remove:
 
 
 run:
-	docker run --name postgres-air -e POSTGRES_PASSWORD=secretpassword -p 5432:5432 -d postgres
+	docker run --name postgres-air -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 -d postgres
 
 restore:
 	docker cp postgres_air_2023.backup postgres-air:/postgres_air_2023.backup
