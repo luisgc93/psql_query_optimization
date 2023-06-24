@@ -1,19 +1,19 @@
 # Define the Makefile targets
 
 
-all: stop run
+all: remove run
 
 recreate: stop remove run restore create-indexes connect
 
 stop:
 	docker stop $$(docker ps -a -q)
 
-remove:
+remove: stop
 	docker rm postgres-air
 
 
 run:
-	docker run --name postgres-air -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 -d postgres
+	docker run --name postgres-air -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 -v postgres-data:/var/lib/postgresql/data -d postgres:15.3
 
 restore:
 	docker cp postgres_air_2023.backup postgres-air:/postgres_air_2023.backup
@@ -30,4 +30,5 @@ create-indexes:
 	docker exec -it postgres-air psql -U postgres -d postgres -p 5432 -c "CREATE INDEX account_last_name ON postgres_air.account(last_name);"
 
 connect:
-	psql -h localhost -p 5432 -U postgres -d postgres
+# for some reason we still need to run SET search_path TO postgres_air;
+	psql -h localhost -p 5432 -U postgres -d postgres 
